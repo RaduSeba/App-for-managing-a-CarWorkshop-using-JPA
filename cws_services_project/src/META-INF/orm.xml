@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://xmlns.jcp.org/xml/ns/persistence/orm"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence/orm
+        http://xmlns.jcp.org/xml/ns/persistence/orm_2_2.xsd" version="2.2">
+
+	<!-- Vehicle queries --> 
+	<named-query name="Vehicle.findByPlate">
+		<query>select v from Vehicle v where v.plateNumber = ?1</query>
+	</named-query>
+	
+	
+	
+	<named-query name="Mechanic.findByDni">
+		<query> select m from Mechanic m where m.dni = ?1</query>
+	</named-query>
+
+	<!-- WorkOrder queries --> 
+	<named-query name="WorkOrder.findByIds">
+		<query>select a from WorkOrder a where a.id in ?1</query>
+	</named-query>
+
+	
+	<named-query name="PaymentMean.findByInvoiceId">
+		<query>
+			select m 
+			from Invoice f 
+				join f.workOrders w 
+				join w.vehicle.client c 
+				join c.paymeantMeans m 
+			where f.id = ?1
+		</query>
+	</named-query>
+	
+	<!-- Mechanic queries -->
+	
+	
+	<named-query name="Mechanic.findAll">
+		<query> select m from Mechanic m </query>
+	</named-query>
+	
+	<named-query name="Mechanic.findById">
+		<query> select m from Mechanic m where m.id = ?1</query>
+	</named-query>
+
+	<!-- Invoice queries -->
+	<named-query name="Invoice.findByNumber">
+		<query>select f from Invoice f where f.number = ?1</query>
+	</named-query>
+	
+	<named-query name="Invoice.getNextInvoiceNumber">
+		<query>select max(f.number) + 1 from Invoice f</query>
+	</named-query>
+	
+	
+	<named-query name="ContractType.findByName">
+		<query>select c from ContractType c where c.name = ?1</query>
+	</named-query>
+	
+	
+	<named-query name="ProfessionalGroup.findByName">
+		<query>select p from ProfessionalGroup p where p.name = ?1</query>
+	</named-query>
+	
+	<named-query name="Payroll.findByContract">
+		<query>select p from Payroll p where p.contract.id = ?1</query>
+	</named-query>
+	
+	
+	<named-query name="Contract.findAll">
+		<query> select c from Contract c </query>
+	</named-query>
+	
+	<named-query name="Contract.findbyMechanic">
+		<query> select c from Contract c where c.mechanic.id = ?1</query>
+	</named-query>
+	
+	<named-query name="ContractType.findAll">
+		<query> select c from ContractType c </query>
+	</named-query>
+	
+<!-- 
+	Use this format if your query has 
+	numeric comparisons as the one in this example
+	
+	<named-query name="findItemsOnSaleByCategoryId">
+		<query>
+			<![CDATA[
+			select i 
+				from Item i join i.categories c
+				where c.id = ?2
+					and i.startDate <= ?1
+					and i.endDate >= ?1 
+			]]>
+		</query>
+	</named-query>
+ -->		
+
+</entity-mappings>

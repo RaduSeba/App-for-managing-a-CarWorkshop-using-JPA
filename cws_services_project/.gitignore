@@ -1,0 +1,5 @@
+/target/
+/bin/
+/eclipselink.log
+/eclipse.log
+/bintests/

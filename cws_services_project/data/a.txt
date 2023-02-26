@@ -1,0 +1,182 @@
+1. All the clients.
+select c 
+from Client c
+2. All the clients from Oviedo
+select c 
+from Client c 
+where c.address.city = 'Oviedo'
+3. All the vehicles of the make “NISSAN”
+select v 
+from Vehicle v 
+where lower(v.make) like '%nissan%'
+4. All work orders completed (but not invoiced). [Note: comparisons with 
+enumerated require package name; e.g. 
+uo.ri.cws.domain.Invoice.InvoiceStatus.NOT_YET_PAID]
+select a 
+from WorkOrder a
+where a.status = uo.ri.model.types.WorkOrderStatus.FINISHED
+5. All work orders repaired between two dates. [Note: date constants with format 
+‘2012-10-01’]
+select a
+from WorkOrder a
+where a.date >= '2012-11-01'
+ and a.date < '2012-12-01'
+Navigation (implicit join)
+6. Work orders assigned to a mechanic specified by its dni
+select a 
+from WorkOrder a
+where a.mechanic.dni = ?1
+7. All work orders of the vehicles of a client determined by their dni
+select a 
+from WorkOrder a
+where a.vehicle.client.dni = ?1
+8. All vehicles of a client indicated by its dni
+select v
+from Vehicle v
+where v.client.dni = ?1
+9. Clients with balance (available > 0) in their vouchers
+select b.client 
+from Voucher b 
+where b.available > 0
+10. All vehicles in which a certain spare part indicated by name has been changed
+Repositorios de Información 2019-2020
+select s.intervention.workOrder.vehicule
+from Substitution s 
+where lower(s.sparePart.name) like '%?1%' 
+Navigation (explicit join)
+11. Vehicles involved in an invoice determined by its number
+select a.vehicle
+from Invoice f 
+join f.workOrders a 
+where f.number = ?1
+12. Payment means used to pay a work order indicated by its id
+select c.paymentMean
+from Charge c 
+join c.invoice f 
+join f.workOrders a 
+where a.id = ?1
+13. All the work orders paid by a credit card specified by its number
+select a 
+from CreditCard tc 
+join tc.charges c 
+join c.invoice f 
+join f.workOrders a 
+where tc.number = ?1
+14. You want to check for inconsistencies in the data: get all the work orders paid by 
+clients who are not the owners of the vehicle
+select a 
+from WorkOrder a
+join a.invoice f 
+join f.charges c 
+join c.paymentMeans mp 
+where a.vehicule.client <> mp.client
+Aggregates
+15. The average intervention time
+select avg(i.minutes) 
+from Intervention i
+16. The average time (in days) for customers to pick up their vehicles. [Note: the 
+subtraction of two dates returns days]
+select avg(a.invoice.date - a.date) 
+from WorkOrder a
+17. The most expensive work order
+select a 
+from WorkOrder a
+where a.amount = (
+select max(aa.amount) 
+from WorkOrder aa
+)
+18. The last invoice number generated
+select max(f.number) 
+from Invoice f
+Repositorios de Información 2019-2020
+19. The number of work orders in which a mechanic worked between two dates
+select count(distinct i.workOrder) 
+from Intervention i
+where i.mechanic.dni = ?1
+ and i.workOrder.date >= ?2
+ and i.workOrder.date < ?3
+With group by
+20. The amount of money spent in our workshop for each client ordered from more 
+to less
+select sum(mp.acummulated) 
+from PaymentMean mp 
+group by mp.client.dni 
+order by sum(mp.acummulated) desc
+21. How many work orders are assigned to each mechanic? Project the mechanic's 
+id and quantity. [Note: mechanics are assigned the work orders of the day; once 
+the work order is finished it no longer has a mechanic assigned]
+select a.mechanic.id, count(a)
+from WorkOrder a
+group by a.mechanic.id
+having a.mechanic.id is not null
+22. List of the amount paid in our workshop with each type of payment method 
+ordered from more to less [Note: The type(o) function returns the type of the 
+object o]
+select sum(mp.acummulated), type(mp)
+from PaymentMean mp
+group by type(mp)
+order by sum(mp.acummulated) desc
+23. List of spare expenses from more to less
+select s.sparePart.id, sum(s.quantity * s.sparePart.price)
+from Substitution s
+group by s.sparePart
+order by sum(s.quantity * s.sparePart.price) desc
+24. Amount of time worked in work orders by each mechanic in between dates
+select i.mechanic.id, sum(i.minutes)
+from Intervention i
+where i.workOrder.date >= ?1
+and i.workOrder.date < ?2
+group by i.mechanic
+25. All the work orders with total intervention time greater than 4 hours (a work 
+order can have several interventions)
+select a
+from WorkOrder a
+where a.id in (
+select i.workOrder.id
+from Intervention i 
+group by i.workOrder.id
+having sum(i.minutes) > 240
+)
+26. The client who has spent the most in our workshop
+select distinct mp.client
+from PaymentMean mp
+Repositorios de Información 2019-2020
+where (
+select sum(mp2.acummulated)
+from PaymentMean mp2
+where mp2.client = mp.client
+) >= ALL (
+select sum(mp3.acummulated)
+from PaymentMean mp3
+group by mp3.client
+)
+27. The most used spare part (of which more quantity has been used)
+select distinct s.sparePart
+from Substitution s
+where (
+select sum(ss.quantity)
+from Substitution ss
+where ss.sparePart = s.sparePart
+) >= ALL (
+select sum(sss.quantity)
+from Substitution sss
+group by sss.sparePart
+)
+28. The average spending per customer in the workshop
+select sum(mp.acummulated) / count(distinct c)
+from Client c 
+left join c.paymentMeans mp
+29. The average number of substitutions per work order
+select (count(s) + 0.0) / count(distinct a)
+from WorkOrder a
+left join a.interventions i 
+left join i.substitucions s
+“count(s) + 0.0” is a tricky way of doing a cast to double. Without 
+that, the result is an integer division (truncates decimals).
+30. The average number of spare parts used per work order
+select sum(s.quantity + 0.0) / count(distinct a)
+from WorkOrder a
+left join a.interventions i 
+left join i.sustitutions s
+s.quantity is an integer, s.quantity + 0.0 is a double so that the 
+division returns a double instead of an integer
