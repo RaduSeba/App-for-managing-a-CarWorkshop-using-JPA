@@ -22,7 +22,9 @@ public class UpdateContractType  implements Command<Void> {
 		
 		ArgumentChecks.isNotNull(dto, "please not null");
 		ArgumentChecks.isNotEmpty(dto.name, "name cannot be empty");
+		ArgumentChecks.isNotBlank(dto.name,"The name cannot be blank");
 		ArgumentChecks.isNotNull(dto.name, "name cannot be null");
+	
 		
 		if(dto.compensationDays<0)
 		{

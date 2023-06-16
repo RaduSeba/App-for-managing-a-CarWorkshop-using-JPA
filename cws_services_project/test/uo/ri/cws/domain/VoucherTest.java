@@ -26,7 +26,7 @@ public class VoucherTest {
 	 * and its available decreases
 	 */
 	@Test
-	public void testPagoBono() {
+	public void testVoucherPayment() {
 		String code = generateNewCode();
 		Voucher b = new Voucher(code, "For test", 100);
 		b.pay( 10 );
@@ -40,7 +40,6 @@ public class VoucherTest {
 	/**
 	 * A voucher cannot be charged with an amount greater than its available
 	 * @return
-	 * @throws IllegalStateException 
 	 */
 	@Test(expected=IllegalStateException.class)
 	public void testCannotBeCharged() {

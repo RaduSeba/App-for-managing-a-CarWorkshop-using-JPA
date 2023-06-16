@@ -70,7 +70,7 @@ public class ProfessionalGroup extends BaseEntity {
 	}
 
 
-	public Set<Contract> _getContracts() {
+	 Set<Contract> _getContracts() {
 		return contracts;
 	}
 	

@@ -14,74 +14,55 @@ import uo.ri.cws.domain.Mechanic;
 import uo.ri.cws.domain.ProfessionalGroup;
 
 public class HireTests {
-    private Mechanic mechanic;
-    private Contract contract;// , secondContract;
-    private ContractType type;
-    private ProfessionalGroup group;
+	private Mechanic mechanic;
+	private Contract contract;
+	private ContractType type;
+	private ProfessionalGroup group;
 
-    @Before
-    public void setUp() {
-	mechanic = new Mechanic("dni", "nombre", "apellidos");
-	type = new ContractType("type", 1.5);
-	group = new ProfessionalGroup("group", 100.0, 10.0);
-	double wage = 1000.0;
+	@Before
+	public void setUp() {
+		mechanic = new Mechanic("dni", "nombre", "apellidos");
+		type = new ContractType("type", 1.5);
+		group = new ProfessionalGroup("group", 100.0, 10.0);
+		double wage = 1000.0;
 
-	contract = new Contract(mechanic, type, group, wage);
-    }
+		contract = new Contract(mechanic, type, group, wage);
+	}
 
-    @Test
-    public void testLinkOnHire() {
-	Optional<Mechanic> m = contract
-		.getMechanic();
-	Optional<Contract> contractInForce = mechanic
-		.getContractInForce();
+	@Test
+	public void testLinkOnHire() {
+		Optional<Mechanic> m = contract.getMechanic();
+		Optional<Contract> contractInForce = mechanic.getContractInForce();
 
-	assertTrue(m
-		.isPresent());
-	assertTrue(m
-		.get()
-		.equals(mechanic));
-	assertTrue(contractInForce
-		.isPresent());
-	assertTrue(contractInForce
-		.get()
-		.equals(contract));
+		assertTrue(m.isPresent());
+		assertTrue(m.get().equals(mechanic));
+		assertTrue(contractInForce.isPresent());
+		assertTrue(contractInForce.get().equals(contract));
 
-    }
+	}
 
-    @Test
-    public void testUnlinkOnHire() {
-	Associations.Hire
-		.unlink(contract, mechanic);
+	@Test
+	public void testUnlinkOnHire() {
+		Associations.Hire.unlink(contract, mechanic);
 
-	assertTrue(mechanic
-		.getContractInForce()
-		.isEmpty());
-	assertTrue(contract
-		.getMechanic()
-		.isPresent());
-    }
+		assertTrue(mechanic.getContractInForce().isEmpty());
+		assertTrue(contract.getMechanic().isPresent());
+	}
 
-    @Test
-    public void testSecondLinkOnHire() {
+	@Test
+	public void testSecondLinkOnHire() {
 
-	Contract secondContract = new Contract(mechanic,
-		new ContractType("othertype", 2.5),
-		new ProfessionalGroup("othergroup", 200.0, 20.0), 2000.0);
+		Contract secondContract = new Contract(
+				mechanic,
+				new ContractType("othertype", 2.5),
+				new ProfessionalGroup("othergroup", 200.0, 20.0),
+				2000.0
+				);
 
-	assertTrue(secondContract
-		.getMechanic()
-		.isPresent());
-	assertTrue(secondContract
-		.getMechanic()
-		.get()
-		.equals(mechanic));
-	assertTrue(mechanic
-		.isInForce());
-	assertTrue(mechanic
-		.getContractInForce()
-		.get()
-		.equals(secondContract));
-    }
+		assertTrue(secondContract.getMechanic().isPresent());
+		assertTrue(secondContract.getMechanic().get().equals(mechanic));
+		assertTrue(mechanic.isInForce());
+		assertTrue(mechanic.getContractInForce().get().equals(secondContract));
+	}
 
 }

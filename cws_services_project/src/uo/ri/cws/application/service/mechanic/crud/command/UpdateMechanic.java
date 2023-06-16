@@ -18,9 +18,12 @@ public class UpdateMechanic implements Command<Void>{
 
 	public UpdateMechanic(MechanicDto dto) {
 		
-		ArgumentChecks.isNotEmpty(dto.id,"Id cannot be empty");
+		ArgumentChecks.isNotEmpty(dto.dni,"dni cannot be empty");
 		ArgumentChecks.isNotEmpty(dto.name,"Name cannot be empty");
-		ArgumentChecks.isNotEmpty(dto.surname);
+		ArgumentChecks.isNotEmpty(dto.surname,"Surname cannot be empty");
+		ArgumentChecks.isNotBlank(dto.dni,"dni cannot be empty");
+		ArgumentChecks.isNotBlank(dto.name,"Name cannot be empty");
+		ArgumentChecks.isNotBlank(dto.surname,"Surname cannot be empty");
 		
 		this.dto = dto;
 	}

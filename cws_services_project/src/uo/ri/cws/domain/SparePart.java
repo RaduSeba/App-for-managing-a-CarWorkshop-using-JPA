@@ -69,7 +69,7 @@ public class SparePart extends BaseEntity {
 	}
 
 
-	public Set<Substitution> getSubstitutions() {
+	public Set<Substitution> getSustitutions() {
 		return new HashSet<>( substitutions );
 	}
 

@@ -56,7 +56,7 @@ public class WorkOrderMappingTests {
 				restored.getDate().truncatedTo(ChronoUnit.MILLIS));
 		assertEquals( workOrder.getDescription(), restored.getDescription() );
 		assertEquals( workOrder.getAmount(), restored.getAmount(), 0.0001 );
-		assertEquals( workOrder.getState(), restored.getState() );
+		assertEquals( workOrder.getStatus(), restored.getStatus() );
 	}
 
 	/**

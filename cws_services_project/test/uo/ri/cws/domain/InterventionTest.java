@@ -50,7 +50,7 @@ public class InterventionTest {
 	 * An intervention with just one sparepart amounts the price of it
 	 */
 	@Test
-	public void testImporteRepuesto() {
+	public void testsAmountSparepart() {
 		Intervention i = new Intervention(mechanic, workOrder, 0);
 		SparePart r = new SparePart("R1001", "junta la trocla", 100.0);
 		new Substitution(r, i, 1);
@@ -62,7 +62,7 @@ public class InterventionTest {
 	 * An intervention with time and spare parts returns the right amount
 	 */
 	@Test
-	public void testImporteIntervencionCompleta() {
+	public void testAmountCompleteIntervention() {
 		Intervention i = new Intervention(mechanic, workOrder, 60);
 
 		SparePart r = new SparePart("R1001", "junta la trocla", 100.0);

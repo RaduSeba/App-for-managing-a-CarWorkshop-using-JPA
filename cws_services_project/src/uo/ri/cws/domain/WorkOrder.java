@@ -28,6 +28,8 @@ import uo.ri.util.assertion.ArgumentChecks;
 		})	
 })
 public class WorkOrder extends BaseEntity {
+	
+	
 	public LocalDateTime getDate() {
 		return date;
 	}
@@ -49,6 +51,11 @@ public class WorkOrder extends BaseEntity {
 
 
 	public WorkOrderState getState() {
+		return state;
+	}
+	
+	
+	public WorkOrderState getStatus() {
 		return state;
 	}
 
@@ -118,9 +125,7 @@ public class WorkOrder extends BaseEntity {
 	}
 	
 	
-	public WorkOrder() {
-		super();
-	}
+	WorkOrder() {}
 	
 	
 	
@@ -233,26 +238,24 @@ public class WorkOrder extends BaseEntity {
 		
 		this.state=WorkOrderState.FINISHED;
 		
-		Iterator<Intervention> i=this._getInterventions().iterator();
-		this.amount=0;
-		int k=this._getInterventions().size();
+		/*
+		 * Iterator<Intervention> i=this._getInterventions().iterator(); this.amount=0;
+		 * int k=this._getInterventions().size();
+		 * 
+		 * while(k>0) { this.amount=this.amount+i.next().getAmount(); k--; }
+		 */
 		
-		while(k>0)
+		double a =0;
+		
+		for(Intervention i : getInterventions())
 		{
-			this.amount=this.amount+i.next().getAmount();
-			k--;
+			a= a+i.getAmount();
 		}
-		
-		
-		
-
-		
-		
-		
-		   
-		
-		
+		this.amount=a;
+			
 	}
+		
+		
 
 	/**
 	 * Changes it back to FINISHED state given the right conditions
@@ -329,7 +332,7 @@ public class WorkOrder extends BaseEntity {
 		return new HashSet<>( interventions );
 	}
 
-	public Set<Intervention> _getInterventions() {
+	 Set<Intervention> _getInterventions() {
 		return interventions;
 	}
 
@@ -352,7 +355,7 @@ public class WorkOrder extends BaseEntity {
 	
 	public double getAmount()
 	{
-		return this.amount;
+		return Math.round(this.amount * 100.0) / 100.0;
 	}
 	
 	public Vehicle getVehicle()
@@ -381,6 +384,19 @@ public class WorkOrder extends BaseEntity {
 	public Invoice getInvoice()
 	{
 		return this.invoice;
+	}
+
+
+	public void setStateForTesting(WorkOrderState invoiced) {
+		this.state = state;
+		
+	}
+
+
+	public void setAmountForTesting(double amount2) {
+		
+		this.amount = amount2;
+		
 	}
 
 }

@@ -1,5 +1,6 @@
 package uo.ri.cws.application.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -14,5 +15,6 @@ public interface Repository<T> {
 	void add(T t);
 	void remove(T t);
 	Optional<T> findById(String id);
+	List<T> findAll();
 }
 

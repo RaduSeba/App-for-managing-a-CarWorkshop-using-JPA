@@ -18,28 +18,31 @@ import uo.ri.cws.domain.ProfessionalGroup;
 import uo.ri.cws.domain.Vehicle;
 import uo.ri.cws.domain.WorkOrder;
 import uo.ri.cws.domain.WorkOrder.WorkOrderState;
+import uo.ri.util.math.Round;
 
 public class PayrollTest {
 
-	private Contract contract;
-	private ContractType type = new ContractType("T", 1.5);
 	private double productivityPercent = 10.0;
-	private double trienniumMoney = 100.0;
-	private ProfessionalGroup group = new ProfessionalGroup("XI",
-			trienniumMoney, productivityPercent);
+	private double trienniumAmount = 100.0;
+	private ProfessionalGroup group = new ProfessionalGroup(
+			"XI",
+			trienniumAmount,
+			productivityPercent
+			);
+	private ContractType type = new ContractType("T", 1.5);
 	private Mechanic mechanic = new Mechanic("dni", "nombre", "apellidos");
-	private LocalDate endDate = LocalDate
-		.now().with(TemporalAdjusters.lastDayOfMonth()), startDate = null;
-	private double monthlyWage = 3650;
+
+	private double expectedMonthlyWage = 3650;
 	private double annualWage = 51100; // salario base anual
-	private double nic = Math.floor(((annualWage * 0.05) / 12) * 100) / 100;
-	private LocalDate june = LocalDate.of(2022, 6, 30);
-	private LocalDate november = LocalDate.of(2022, 11, 30);
+	private double expectedNic = Round.twoCents( annualWage * 0.05 / 12 );
+
+	private Contract contract;
 
 	@Before
 	public void setUp() throws Exception {
-		endDate = LocalDate
-			.now().plusMonths(6).with(TemporalAdjusters.lastDayOfMonth());
+		LocalDate endDate = LocalDate.now()
+				.plusMonths(6)
+				.with(TemporalAdjusters.lastDayOfMonth());
 
 		contract = new Contract(mechanic, type, group, endDate, annualWage);
 	}
@@ -76,157 +79,196 @@ public class PayrollTest {
 	 */
 	@Test
 	public void testConstructorWithDate() {
-		LocalDate d = LocalDate.now().minusDays(1).minusMonths(2).minusYears(3);
+		LocalDate d = LocalDate.now()
+				.minusDays(1)
+				.minusMonths(2)
+				.minusYears(3);
+
 		Payroll p = new Payroll(contract, d);
-		assertTrue(p.getContract().equals(contract));
-		assertTrue(p.getDate().equals(d));
+		assertEquals( contract, p.getContract() );
+		assertEquals( d, p.getDate() );
 	}
 
 	@Test
-	public void testNovemberNoActivityShortTermContract() {
-		startDate = LocalDate
-			.now().minusMonths(7).with(TemporalAdjusters.firstDayOfMonth());
-		contract.setStartDate(startDate);
+	public void testNoActivityShortTermContract() {
+		LocalDate january = LocalDate.now()
+				.withMonth(1)
+				.with(TemporalAdjusters.firstDayOfMonth());
 
-		Payroll p = new Payroll(contract, november);
+		LocalDate march = LocalDate.now()
+				.withMonth(3)
+				.with(TemporalAdjusters.firstDayOfMonth());
 
-		assertTrue(p.getDate().equals(november));
-		assertTrue(p.getContract().equals(contract));
-		double irpf = this.monthlyWage * 0.37;
+		contract.setStartDate(january);
 
-		assertEquals(p.getMonthlyWage(), this.monthlyWage, 0.01);
-		assertEquals(p.getBonus(), 0.0, 0.01);
-		assertEquals(p.getProductivityBonus(), 0.0, 0.01);
-		assertEquals(p.getTrienniumPayment(), 0.0, 0.01);
-		assertEquals(p.getNIC(), nic, 0.01);
-		assertEquals(p.getIncomeTax(), irpf, 0.01);
+		Payroll p = new Payroll(contract, march);
+		double expectedIrpf = expectedMonthlyWage * 0.37;
+
+		assertEquals( march, p.getDate() );
+		assertEquals( contract, p.getContract() );
+
+		assertEquals(expectedMonthlyWage, p.getMonthlyWage(), 0.01);
+		assertEquals(0.0, p.getBonus(), 0.01);
+		assertEquals(0.0, p.getProductivityBonus(), 0.01);
+		assertEquals(0.0, p.getTrienniumPayment(), 0.01);
+		assertEquals(expectedNic, p.getNIC(), 0.01);
+		assertEquals(expectedIrpf, p.getIncomeTax(), 0.01);
 
 	}
 
 	@Test
 	public void testJuneNoActivityShortTermContract() {
-		startDate = LocalDate
-			.now().minusMonths(7).with(TemporalAdjusters.firstDayOfMonth());
-		contract.setStartDate(startDate);
+		LocalDate january = LocalDate.now()
+				.withMonth( 1 )
+				.with(TemporalAdjusters.firstDayOfMonth());
+
+		LocalDate june = LocalDate.now()
+				.withMonth(6)  // June -> extra
+				.with(TemporalAdjusters.firstDayOfMonth());
+
+		contract.setStartDate(january);
 		Payroll p = new Payroll(contract, june);
+		double expectedIrpf = expectedMonthlyWage * 2 * 0.37;
 
-		assertTrue(p.getDate().equals(june));
-		assertTrue(p.getContract().equals(contract));
-		double irpf = this.monthlyWage * 2 * 0.37;
-		
-		assertEquals(p.getMonthlyWage(), this.monthlyWage, 0.01); // june ->
-																	// extra
-		assertEquals(p.getBonus(), this.monthlyWage, 0.01);
-		assertEquals(p.getProductivityBonus(), 0.0, 0.01);
-		assertEquals(p.getTrienniumPayment(), 0.0, 0.01);
-		assertEquals(p.getNIC(), nic, 0.01);
-		assertEquals(p.getIncomeTax(), irpf, 0.01);
+		assertEquals( june, p.getDate() );
+		assertEquals( contract, p.getContract() );
 
+		assertEquals(expectedMonthlyWage, p.getMonthlyWage(), 0.01);
+		assertEquals(expectedMonthlyWage, p.getBonus(), 0.01);
+		assertEquals(0.0, p.getProductivityBonus(), 0.01);
+		assertEquals(0.0, p.getTrienniumPayment(), 0.01);
+		assertEquals(expectedNic, p.getNIC(), 0.01);
+		assertEquals(expectedIrpf, p.getIncomeTax(), 0.01);
 	}
 
 	@Test
 	public void testNovemberWithProductivityNoTriennium() {
-		startDate = LocalDate
-			.now().minusMonths(7).with(TemporalAdjusters.firstDayOfMonth());
-		contract.setStartDate(startDate);
-		double interventions = 365.0;
-		double productivity = interventions * productivityPercent / 100; // productividad
-																			// mensual
-		createWorkOrders(november, interventions);
-		double irpf = (this.monthlyWage + productivity) * 0.37;
+		double workOrderAmount = 365.0;
+		double productivity = workOrderAmount * productivityPercent / 100;
+		double irpf = (expectedMonthlyWage + productivity) * 0.37;
+
+		LocalDate january = LocalDate.now()
+				.withMonth( 1 )
+				.with(TemporalAdjusters.firstDayOfMonth());
+
+		LocalDate november = LocalDate.now()
+				.withMonth( 11 )
+				.with(TemporalAdjusters.firstDayOfMonth());
+
+		contract.setStartDate(january);
+		addWorkOrdersToMechanic(november, workOrderAmount);
 		Payroll p = new Payroll(contract, november);
 
-		assertTrue(p.getDate().equals(november));
-		assertTrue(p.getContract().equals(contract));
-		assertEquals(p.getMonthlyWage(), this.monthlyWage, 0.01); // june ->
-																	// extra
-		assertEquals(p.getBonus(), 0.0, 0.01);
-		assertEquals(p.getProductivityBonus(), productivity, 0.01);
-		assertEquals(p.getTrienniumPayment(), 0.0, 0.01);
-		assertEquals(p.getNIC(), nic, 0.01);
-		assertEquals(p.getIncomeTax(), irpf, 0.01);
+		assertEquals( november, p.getDate() );
+		assertEquals( contract, p.getContract() );
+
+		assertEquals(expectedMonthlyWage, p.getMonthlyWage(), 0.01);
+		assertEquals(0.0, p.getBonus(), 0.01);
+		assertEquals(productivity, p.getProductivityBonus(), 0.01);
+		assertEquals(0.0, p.getTrienniumPayment(), 0.01);
+		assertEquals(expectedNic, p.getNIC(), 0.01);
+		assertEquals(irpf, p.getIncomeTax(), 0.01);
 
 	}
 
 	@Test
 	public void testJuneWithProductivityNoTriennium() {
-		startDate = LocalDate
-			.now().minusMonths(7).with(TemporalAdjusters.firstDayOfMonth());
-		contract.setStartDate(startDate);
 		double interventions = 365.0;
-		double productivity = interventions * productivityPercent / 100; // productividad
-																			// mensual
-		createWorkOrders(june, interventions);
-		double irpf = (this.monthlyWage * 2 + productivity) * 0.37;
+		double productivity = interventions * productivityPercent / 100; // productividad mensual
+		double irpf = (this.expectedMonthlyWage * 2 + productivity) * 0.37;
+
+		LocalDate january = LocalDate.now()
+				.withMonth( 1 )
+				.with(TemporalAdjusters.firstDayOfMonth());
+
+		LocalDate june = LocalDate.now()
+				.withMonth(6)  // June -> extra
+				.with(TemporalAdjusters.firstDayOfMonth());
+
+		contract.setStartDate(january);
+		addWorkOrdersToMechanic(june, interventions);
 		Payroll p = new Payroll(contract, june);
 
-		assertTrue(p.getDate().equals(june));
-		assertTrue(p.getContract().equals(contract));
-		assertEquals(p.getMonthlyWage(), this.monthlyWage, 0.01);
-		assertEquals(p.getBonus(), this.monthlyWage, 0.01);// june -> extra
-		assertEquals(p.getProductivityBonus(), productivity, 0.01);
-		assertEquals(p.getTrienniumPayment(), 0.0, 0.01);
-		assertEquals(p.getNIC(), nic, 0.01);
-		assertEquals(p.getIncomeTax(), irpf, 0.01);
+		assertEquals( june, p.getDate() );
+		assertEquals( contract, p.getContract() );
+
+		assertEquals(expectedMonthlyWage, p.getMonthlyWage(), 0.01);
+		assertEquals(expectedMonthlyWage, p.getBonus(), 0.01);// june -> extra
+		assertEquals(productivity, p.getProductivityBonus(), 0.01);
+		assertEquals(0.0, p.getTrienniumPayment(), 0.01);
+		assertEquals(expectedNic, p.getNIC(), 0.01);
+		assertEquals(irpf, p.getIncomeTax(), 0.01);
 	}
 
 	@Test
 	public void testNovemberWithProductivityWithTriennium() {
-		startDate = LocalDate
-			.now().minusMonths(38).with(TemporalAdjusters.firstDayOfMonth());
-		contract.setStartDate(startDate);
-		double interventions = 365.0;
-		double productivity = interventions * productivityPercent / 100; // productividad
-																			// mensual
-		createWorkOrders(november, interventions);
-		double irpf = (this.monthlyWage + productivity + trienniumMoney) * 0.37;
+		double workOrderAmount = 365.0;
+		double productivity = workOrderAmount * productivityPercent / 100;
+		double irpf = (expectedMonthlyWage + productivity + trienniumAmount) * 0.37;
+
+		LocalDate januaryThreeYearsAgo = LocalDate.now()
+				.withMonth( 1 )
+				.minusYears( 3 )
+				.with(TemporalAdjusters.firstDayOfMonth());
+
+		LocalDate november = LocalDate.now()
+				.withMonth( 11 )
+				.with(TemporalAdjusters.firstDayOfMonth());
+
+		contract.setStartDate( januaryThreeYearsAgo );
+		addWorkOrdersToMechanic(november, workOrderAmount);
 		Payroll p = new Payroll(contract, november);
 
-		assertTrue(p.getDate().equals(november));
-		assertTrue(p.getContract().equals(contract));
-		assertEquals(p.getMonthlyWage(), this.monthlyWage, 0.01);
-		assertEquals(p.getBonus(), 0.0, 0.01);
-		assertEquals(p.getProductivityBonus(), productivity, 0.01);
-		assertEquals(p.getTrienniumPayment(), trienniumMoney, 0.01);
-		assertEquals(p.getNIC(), nic, 0.01);
-		assertEquals(p.getIncomeTax(), irpf, 0.01);
+		assertEquals( november, p.getDate() );
+		assertEquals( contract, p.getContract() );
 
+		assertEquals(expectedMonthlyWage, p.getMonthlyWage(), 0.01);
+		assertEquals(0.0, p.getBonus(), 0.01);
+		assertEquals(productivity, p.getProductivityBonus(), 0.01);
+		assertEquals(trienniumAmount, p.getTrienniumPayment(), 0.01);
+		assertEquals(expectedNic, p.getNIC(), 0.01);
+		assertEquals(irpf, p.getIncomeTax(), 0.01);
 	}
 
 	@Test
 	public void testJuneWithProductivityWithTriennium() {
-		startDate = LocalDate
-			.now().minusMonths(55).with(TemporalAdjusters.firstDayOfMonth());
-		contract.setStartDate(startDate);
-		double interventions = 365.0;
-		double productivity = interventions * productivityPercent / 100; // productividad
-																			// mensual
-		createWorkOrders(june, interventions);
-		double irpf = (this.monthlyWage * 2 + productivity + trienniumMoney)
+		double workOrderAmount = 365.0;
+		double productivity = workOrderAmount * productivityPercent / 100;
+		double irpf = (expectedMonthlyWage * 2 + productivity + trienniumAmount)
 				* 0.37;
+
+		LocalDate januaryThreeYearsAgo = LocalDate.now()
+				.withMonth( 1 )
+				.minusYears( 3 )
+				.with(TemporalAdjusters.firstDayOfMonth());
+
+		LocalDate june = LocalDate.now()
+				.withMonth( 6 )
+				.with(TemporalAdjusters.firstDayOfMonth());
+
+		contract.setStartDate( januaryThreeYearsAgo );
+		addWorkOrdersToMechanic(june, workOrderAmount);
 		Payroll p = new Payroll(contract, june);
 
-		assertTrue(p.getDate().equals(june));
-		assertTrue(p.getContract().equals(contract));
-		assertEquals(p.getMonthlyWage(), this.monthlyWage, 0.01);
-		assertEquals(p.getBonus(), monthlyWage, 0.01);// june -> extra
-		assertEquals(p.getProductivityBonus(), productivity, 0.01);
-		assertEquals(p.getTrienniumPayment(), trienniumMoney, 0.01);
-		assertEquals(p.getNIC(), nic, 0.01);
+		assertEquals(june, p.getDate() );
+		assertEquals(contract, p.getContract() );
+		assertEquals(expectedMonthlyWage, p.getMonthlyWage(), 0.01);
+		assertEquals(expectedMonthlyWage, p.getBonus(), 0.01);// june -> extra
+		assertEquals(productivity, p.getProductivityBonus(), 0.01);
+		assertEquals(trienniumAmount, p.getTrienniumPayment(), 0.01);
+		assertEquals(expectedNic, p.getNIC(), 0.01);
 		assertEquals(p.getIncomeTax(), irpf, 0.01);
-
 	}
 
-	private void createWorkOrders(LocalDate month, double money) {
+	private void addWorkOrdersToMechanic(LocalDate month, double amount) {
 
 		Vehicle v = new Vehicle("plate", "seat", "panda");
 
 		WorkOrder wo = new WorkOrder(v, month.atStartOfDay());
 		wo.assignTo(mechanic);
-		wo.setState(WorkOrderState.INVOICED);
-		wo.setAmount(money);
+		wo.setStateForTesting(WorkOrderState.INVOICED);
+		wo.setAmountForTesting(amount);
 		new Intervention(mechanic, wo, month.atStartOfDay(), 10);
-
 	}
 
 }

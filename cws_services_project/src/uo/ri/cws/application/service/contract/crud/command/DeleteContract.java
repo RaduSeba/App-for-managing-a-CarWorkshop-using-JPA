@@ -39,14 +39,27 @@ public class DeleteContract implements Command<Void>{
 		
 		Contract c=co.get();
 		
+		if(c.getMechanic().isEmpty())
+		{
+			repo.remove(c);
+			
+			
+			
+			
+			return null;
+		}
+		
 		Optional<Mechanic> om=mrepo.findById(c.getMechanic().get().getId());
 		
-		
+		//List<Payroll> po=prepo.findByContract(id);
 		BusinessChecks.isTrue(om.get().getAssigned().isEmpty(),"The mechanic has workorders");
 		
-		List<Payroll> po=prepo.findByContract(id);
+		BusinessChecks.isTrue(om.get().getContractInForce().get().getPayrolls().isEmpty(),"The mechanic has workorders");
+		//BusinessChecks.isTrue(po.isEmpty(), "THE contrat has genrated payrools");
 		
-		BusinessChecks.isTrue(po.isEmpty(), "THE contrat has genrated payrools");
+		
+		
+		
 			
 		repo.remove(c);
 			

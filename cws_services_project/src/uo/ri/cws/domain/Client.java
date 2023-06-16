@@ -42,7 +42,7 @@ public class Client extends BaseEntity {
 	
 	
 	
-	public Set<PaymentMean> _getPaymeantMean() {
+	 Set<PaymentMean> _getPaymeantMean() {
 		return paymeantMeans;
 	}
 
@@ -57,12 +57,12 @@ public class Client extends BaseEntity {
 		this.paymeantMeans = paymeantMean;
 	}
 
-	public void _setPaymeantMean(PaymentMean paymeantMean) {
+	 void _setPaymeantMean(PaymentMean paymeantMean) {
 		
 		//return new HashSet<>(paymentMean);
 	}
 
-	public Set<Vehicle> _getVehicles() {
+	 Set<Vehicle> _getVehicles() {
 		return vehicles;
 	}
 
@@ -74,7 +74,7 @@ public class Client extends BaseEntity {
 
 
 
-	public void _setVehicles(Set<Vehicle> vehicles) {
+	 void _setVehicles(Set<Vehicle> vehicles) {
 		this.vehicles = vehicles;
 	}
 

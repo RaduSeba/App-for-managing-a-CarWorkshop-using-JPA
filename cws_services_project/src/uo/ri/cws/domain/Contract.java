@@ -3,7 +3,11 @@ package uo.ri.cws.domain;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -22,13 +26,8 @@ import uo.ri.cws.domain.base.BaseEntity;
 import uo.ri.util.assertion.ArgumentChecks;
 
 @Entity
-@Table(name="TCONTRACTS",uniqueConstraints = {
-		
-		@UniqueConstraint(columnNames= {
-				"CONTRACTYPE_ID","MECHANIC_ID",
-				"PROFESSIONALGROUP_ID"
-		})	
-})
+@Table(name = "TCONTRACTS", uniqueConstraints = {
+		@UniqueConstraint(columnNames = { "MECHANIC_ID", "STARTDATE" }) })
 public class Contract extends BaseEntity {
 
 	
@@ -58,40 +57,36 @@ public class Contract extends BaseEntity {
 	
 	Contract(){};
 	
-	public Contract(Mechanic mechanic, ContractType type, ProfessionalGroup group, LocalDate endDate,double wage)
-	{
-		
-		ArgumentChecks.isNotNull(mechanic);
-		//ArgumentChecks.isNotNull(endDate);
-		ArgumentChecks.isTrue(wage>= 0);
-		ArgumentChecks.isNotNull(type);
-		ArgumentChecks.isNotNull(group);
-		
-		
-		
-		this.mechanic=mechanic;
-		this.startDate=LocalDate.now().with(TemporalAdjusters.firstDayOfNextMonth());;
-		this.endDate=endDate;
-		this.annualbaseWage=wage;
-		this.contracttype=type;
-		this.professionalgroup=group;
-		Associations.Group.link(this,group);
-		Associations.Hire.link(mechanic,this);
-		Associations.Type.link(this,type);
-		
+
 	
-		
-		
-		
-		
+	public Contract(Mechanic mechanic, ContractType type, ProfessionalGroup group, LocalDate endDate, double wage) {
+	    ArgumentChecks.isNotNull(mechanic);
+	    ArgumentChecks.isTrue(wage >= 0);
+	    ArgumentChecks.isNotNull(type);
+	    ArgumentChecks.isNotNull(group);
+
+	    this.mechanic = mechanic;
+	    this.startDate = LocalDate.now().with(TemporalAdjusters.firstDayOfNextMonth());
+	    this.endDate = endDate;
+	    this.annualbaseWage = wage;
+	    this.contracttype = type;
+	    this.professionalgroup = group;
+	    Associations.Group.link(this, group);
+	    Associations.Hire.link(mechanic, this);
+	    Associations.Type.link(this, type);
+	  
 	}
+
 	
-	public Contract(Mechanic mechanic,ContractType type,ProfessionalGroup group,double wage)
-	{
-		
-		this(mechanic,type,group,LocalDate.now().with(TemporalAdjusters.lastDayOfMonth()),wage);
-		
+
+	
+	public Contract(Mechanic mechanic, ContractType type, ProfessionalGroup group, double wage) {
+	    this(mechanic, type, group,LocalDate.now().plusMonths(1).with(TemporalAdjusters.lastDayOfMonth()), wage);
 	}
+
+	
+
+
 
 
 	public double getAnnualBaseWage() {
@@ -105,7 +100,7 @@ public class Contract extends BaseEntity {
 
 
 	public Optional<LocalDate> getEndDate() {
-		return Optional.of(endDate);
+		return Optional.ofNullable(endDate);
 	}
 
 
@@ -116,12 +111,19 @@ public class Contract extends BaseEntity {
 
 	public double getSettlement() {
 		
-		double payrool=calculateannualwage();
+		double payrool=calculateAnnualWage();
+		int years = LocalDate.now().getYear() - startDate.getYear();
 		
-		this.settlement = payrool/365 * this.contracttype.getCompensationDays()*ChronoUnit.YEARS.between( 
-			   this.startDate  , 
-			   this.endDate
-			) ;
+		int months = LocalDate.now().getMonthValue() - startDate.getMonthValue();
+		
+		if(months < 0 && years==1)
+		{
+			return 0;
+		}
+		
+		payrool=payrool/365;
+		
+		this.settlement = payrool * this.contracttype.getCompensationDays()*years;
 		
 		return this.settlement;
 	}
@@ -129,7 +131,7 @@ public class Contract extends BaseEntity {
 
 	public void setSettlement() {
 		
-		double payrool=calculateannualwage();
+		double payrool=calculateAnnualWage();
 		
 		this.settlement = payrool/365 * this.contracttype.getCompensationDays()*ChronoUnit.YEARS.between( 
 			   this.startDate  , 
@@ -138,24 +140,42 @@ public class Contract extends BaseEntity {
 	}
 	
 	
-	public double calculateannualwage()
+	public double calculateAnnualWage()
 	{
-		double payrool=0;
-		int times=this.getPayrolls().size()-12;
-		int k=1;
-		for(Payroll p:this.getPayrolls())
-		{
-			if(k<=times)
-			{
-				
-			}
-			else
-			{
-				payrool=payrool+p.getMonthlyWage()+p.getBonus()+p.getProductivityBonus()+p.getTrienniumPayment();
-			}
-			k++;
-		}
-		return payrool;
+
+		
+		
+		double payroll = 0;
+	    
+	    
+	    
+	 
+
+	 // Convert set to a list
+	 List<Payroll> list = new ArrayList<>(this.getPayrolls());
+	 Collections.sort(list, payrollComp);
+
+	 // Get the sublist containing the last 12 elements
+	 int startIndex = Math.max(list.size() - 12, 0);  // Starting index
+	 List<Payroll> last12Elements = list.subList(startIndex, list.size());
+
+	 // Iterate through the last 12 elements
+	 for (Payroll p : last12Elements) {
+	    
+		  payroll += p.getMonthlyWage() + p.getBonus()
+		  + p.getProductivityBonus() + p.getTrienniumPayment();
+	 }
+
+	    
+
+	    if (payroll==0)
+	    {
+	    	return payroll;
+	    }
+	    
+	    return payroll;
+		
+
 		
 	}
 
@@ -214,7 +234,7 @@ public class Contract extends BaseEntity {
 	}
 
 
-	public Set<Payroll> _getPayrools() {
+	 Set<Payroll> _getPayrools() {
 		return payrools;
 	}
 	
@@ -234,13 +254,17 @@ public class Contract extends BaseEntity {
 	
 	public void terminate()
 	{
+		Associations.Fire.link(this,mechanic);
 		this.state=ContractState.TERMINATED;
-		this.mechanic._setContract(Optional.empty());
-		this.mechanic._getTerminatedContracts().add(this);
-		this.firedmechanic=this.mechanic;
+		
+		this.endDate= LocalDate.now().with(TemporalAdjusters.lastDayOfMonth());
+		this.settlement =Math.floor(getSettlement() * 100) / 100;
 		//this.mechanic=null;
 		
 	}
+	
+	
+
 	
 	public Optional<Mechanic> getFiredMechanic()
 	{
@@ -276,7 +300,8 @@ public class Contract extends BaseEntity {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(firedmechanic, mechanic, startDate);
+		//return Objects.hash(firedmechanic, mechanic, startDate);
+		return Objects.hash( mechanic, startDate);
 	}
 
 	@Override
@@ -292,6 +317,14 @@ public class Contract extends BaseEntity {
 				&& Objects.equals(mechanic, other.mechanic)
 				&& Objects.equals(startDate, other.startDate);
 	}
+	
+	private static Comparator<Payroll> payrollComp = new Comparator<Payroll>() {
+		@Override
+		public int compare(Payroll p1, Payroll p2) {
+			return p1.getDate().compareTo(p2.getDate());
+		}
+
+	};
 	
 	
 	

@@ -34,7 +34,7 @@ public class VoucherMappingTests {
 
 		voucher = new Voucher("voucher-code", "voucher-description", 100);
 
-		Associations.Pay.link(client, voucher);
+		Associations.Pay.link(voucher, client);
 
 		unitOfWork.persist(client, voucher);
 	}

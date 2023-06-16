@@ -1,5 +1,6 @@
 package uo.ri.cws.application.service.contract.crud.command;
 
+import java.util.List;
 import java.util.Optional;
 
 import uo.ri.conf.Factory;
@@ -13,6 +14,7 @@ import uo.ri.cws.application.util.BusinessChecks;
 import uo.ri.cws.application.util.DtoAssembler;
 import uo.ri.cws.application.util.command.Command;
 import uo.ri.cws.domain.Contract;
+import uo.ri.cws.domain.Contract.ContractState;
 import uo.ri.cws.domain.ContractType;
 import uo.ri.cws.domain.Mechanic;
 import uo.ri.cws.domain.ProfessionalGroup;
@@ -29,6 +31,9 @@ public class AddContract  implements Command<ContractDto> {
 	public AddContract(ContractDto dto) {
 		ArgumentChecks.isNotNull(dto, "THe contract is null");
 		ArgumentChecks.isNotEmpty(dto.dni, "The dni cannot be null");
+		ArgumentChecks.isNotBlank(dto.dni, "The dni cannot be empty");
+		
+		
 		ArgumentChecks.isNotNull(dto.contractTypeName, "The contract type cannot be null");
 		ArgumentChecks.isNotNull(dto.professionalGroupName, "The contract type cannot be null");
 	
@@ -42,15 +47,42 @@ public class AddContract  implements Command<ContractDto> {
 		Optional<ContractType> ct=ctrepo.findByName(cdto.contractTypeName);
 		Optional<ProfessionalGroup> pg=prepo.findByName(cdto.professionalGroupName);
 		
+		if(cdto.endDate!=null)
+		{
+			BusinessChecks.isFalse(cdto.startDate.isEqual(cdto.endDate),"the dates are wrong");
+		}
 		BusinessChecks.isFalse(om.isEmpty(),"The mechanic doesn t  exist");
 		BusinessChecks.isFalse(ct.isEmpty(),"The contractType doesn t  exist");
 		BusinessChecks.isFalse(pg.isEmpty(),"The professionalgroup doesn t  exist");
 		
-		Contract c=new Contract(om.get(),ct.get(),pg.get(),cdto.endDate,cdto.annualBaseWage	);
+		List<Contract> cg=repo.findByMechanicId(om.get().getId());
 		
-		repo.add(c);
 		
-		return DtoAssembler.toDto(c);
+		
+	if(cg.isEmpty()==false)
+		{
+			if(cg.get(0).getState().equals(ContractState.TERMINATED))
+			{
+				
+			}
+			else
+			{
+				cg.get(0).terminate();
+			}
+			
+			Contract c=new Contract(om.get(),ct.get(),pg.get(),cdto.annualBaseWage	);
+			repo.add(c);
+			return DtoAssembler.toDto(c);
+		}
+		else {
+			Contract c=new Contract(om.get(),ct.get(),pg.get(),cdto.annualBaseWage	);
+			repo.add(c);
+			return DtoAssembler.toDto(c);
+		}
+		
+		
+		
+	
 		
 	}
 

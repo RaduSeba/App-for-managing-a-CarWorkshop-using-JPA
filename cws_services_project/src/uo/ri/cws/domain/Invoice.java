@@ -9,6 +9,8 @@ import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -19,12 +21,13 @@ import uo.ri.util.math.Round;
 
 
 @Entity
-@Table(name="TINVOICES", uniqueConstraints = {
-		
-		@UniqueConstraint(columnNames= {
-				"NUMBER"
-		})	
-})
+//@Table(name="TINVOICES", uniqueConstraints = {
+//		
+//		@UniqueConstraint(columnNames= {
+//				"number"
+//		})	
+//})
+@Table(name="TINVOICES")
 public class Invoice extends BaseEntity {
 	
 
@@ -33,7 +36,7 @@ public class Invoice extends BaseEntity {
 	@Basic(optional=false)private LocalDate date;
 	private double amount;
 	private double vat;
-	private InvoiceState state = InvoiceState.NOT_YET_PAID;
+	@Enumerated(EnumType.STRING)private InvoiceState status = InvoiceState.NOT_YET_PAID;
 
 	// accidental attributes
 	@OneToMany(mappedBy ="Invoice") 
@@ -70,11 +73,18 @@ public class Invoice extends BaseEntity {
 	}
 
 	public InvoiceState getState() {
-		return state;
+		return status;
+	}
+	
+	public InvoiceState getStatus() {
+		return status;
 	}
 
+	
+
+	
 	public void setState(InvoiceState state) {
-		this.state = state;
+		this.status = state;
 	}
 
 	public void setCharges(Set<Charge> charges) {
@@ -128,6 +138,7 @@ public class Invoice extends BaseEntity {
 			this.amount = Round.twoCents(this.amount);
 		
 		
+		
 	}
 
 	/**
@@ -168,9 +179,35 @@ public class Invoice extends BaseEntity {
 	 *  - Or the amounts paid with charges to payment means do not cover
 	 *  	the total of the invoice
 	 */
-	public void settle() {
+	public void settle() throws IllegalStateException {
 		
-		this.state=InvoiceState.PAID;
+		ArgumentChecks.isFalse(this.status==InvoiceState.PAID);
+		double a =0;
+		
+		for(Charge c: getCharges())
+		{
+			a=a+c.getAmount();
+		}
+		
+		double realamount1=getAmount()+0.013;
+		double realamount2=getAmount()-0.01;
+		
+		
+		if(a > realamount1)
+		{
+			
+			throw new IllegalStateException();
+		}
+		
+		
+		if(a < realamount2)
+		{
+			
+			throw new IllegalStateException();
+		}
+		
+		
+		this.status=InvoiceState.PAID;
 
 	}
 
@@ -178,7 +215,7 @@ public class Invoice extends BaseEntity {
 		return new HashSet<>( workOrders );
 	}
 
-	public Set<WorkOrder> _getWorkOrders() {
+	 Set<WorkOrder> _getWorkOrders() {
 		return workOrders;
 	}
 
@@ -186,7 +223,7 @@ public class Invoice extends BaseEntity {
 		return new HashSet<>( charges );
 	}
 
-	public Set<Charge> _getCharges() {
+	 Set<Charge> _getCharges() {
 		return charges;
 	}
 	
@@ -197,11 +234,20 @@ public class Invoice extends BaseEntity {
 	
 	public boolean isNotSettled()
 	{
-		if(this.state==InvoiceState.NOT_YET_PAID)
+		if(this.status==InvoiceState.NOT_YET_PAID)
 		{
 			return true;
 		}
 		return false;
+	}
+	
+	public boolean isSettled()
+	{
+		if(this.status==InvoiceState.NOT_YET_PAID)
+		{
+			return false;
+		}
+		return true;
 	}
 
 
@@ -225,6 +271,9 @@ public class Invoice extends BaseEntity {
 		Invoice other = (Invoice) obj;
 		return Objects.equals(number, other.number);
 	}
+
+
+	
 	
 	
 	

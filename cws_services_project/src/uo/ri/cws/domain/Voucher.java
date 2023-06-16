@@ -25,9 +25,7 @@ public class Voucher extends PaymentMean {
 	
 	
 	
-	public Voucher() {
-		super();
-	}
+	 Voucher() {}
 
 
 

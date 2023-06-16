@@ -1,7 +1,9 @@
 package uo.ri.cws.domain;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 
@@ -25,11 +27,11 @@ import uo.ri.util.assertion.ArgumentChecks;
 public class Intervention extends BaseEntity{
 
 	public LocalDateTime getDate() {
-		return date;
+		return date.atStartOfDay();
 	}
 
 	public void setDate(LocalDateTime date) {
-		this.date = date;
+		this.date = date.toLocalDate();
 	}
 
 	public int getMinutes() {
@@ -41,7 +43,7 @@ public class Intervention extends BaseEntity{
 	}
 
 	// natural attributes
-	@Basic(optional=false) private LocalDateTime date;
+	@Basic(optional=false) private LocalDate date;
 	private int minutes;
 
 	// accidental attributes
@@ -91,17 +93,52 @@ public class Intervention extends BaseEntity{
 		
 		amount=this.workOrder.getVehicle().getVehicleType().getPricePerHour()*this.getMinutes()/60;
 		
-		if(this._getSubstitutions().isEmpty()&&this.minutes==0)
+		if(this.getSubstitutions().isEmpty()&&this.minutes==0)
 		{
 			return 0;
 		}
-		if(this._getSubstitutions().isEmpty())
+		if(this.getSubstitutions().isEmpty())
 		{
 			return amount;
 		}
 		
-		amount=amount+this.workOrder._getInterventions().iterator().next()._getSubstitutions().iterator().next().getSparePart().getPrice()*this.workOrder._getInterventions().iterator().next()._getSubstitutions().iterator().next().getQuantity();
 		
+		
+		//amount=amount+this.workOrder._getInterventions().iterator().next()._getSubstitutions().iterator().next().getSparePart().getPrice()*this.workOrder._getInterventions().iterator().next()._getSubstitutions().iterator().next().getQuantity();
+		
+		// Assuming you have the necessary classes and variables in place
+
+//		Iterator<Intervention> interventionIterator = this.workOrder.getInterventions().iterator();
+//
+//		if (interventionIterator.hasNext()) {
+//		    Intervention intervention = interventionIterator.next();
+//		    Iterator<Substitution> substitutionIterator = intervention.getSubstitutions().iterator();
+//
+//		    if (substitutionIterator.hasNext()) {
+//		        Substitution substitution = substitutionIterator.next();
+//		        SparePart sparePart = substitution.getSparePart();
+//		        double price = sparePart.getPrice();
+//		        double quantity = substitution.getQuantity();
+//		        amount += price * quantity;
+//		    }
+//		}
+		
+		Set<Intervention> interventions = this.workOrder.getInterventions();
+
+		for (Intervention intervention : interventions) {
+		    Set<Substitution> substitutions = intervention.getSubstitutions();
+		    
+		    for (Substitution substitution : substitutions) {
+		        SparePart sparePart = substitution.getSparePart();
+		        double price = sparePart.getPrice();
+		        double quantity = substitution.getQuantity();
+		        amount += price * quantity;
+		       // break; // Exit the inner loop after processing the first substitution
+		    }
+		    //break; // Exit the outer loop after processing the first intervention
+		}
+
+
 
 		return amount;
 	}
@@ -118,7 +155,7 @@ public class Intervention extends BaseEntity{
 		
 		this.mechanic = mechanic;
 		this.workOrder = workOrder;
-		this.date = date;
+		this.date = date.toLocalDate();
 		this.minutes = minutes;
 		
 		

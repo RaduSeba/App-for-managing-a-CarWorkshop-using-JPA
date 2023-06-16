@@ -38,7 +38,7 @@ public class Vehicle extends BaseEntity {
 	}
 	
 
-	public Set<WorkOrder> _getWorkOrders() {
+	 Set<WorkOrder> _getWorkOrders() {
 		return workOrder;
 	}
 
@@ -62,7 +62,7 @@ public class Vehicle extends BaseEntity {
 
 
 
-	public void _setVehicleType(VehicleType vehicleType) {
+	 void _setVehicleType(VehicleType vehicleType) {
 		this.vehicleType = vehicleType;
 	}
 
@@ -78,7 +78,7 @@ public class Vehicle extends BaseEntity {
 
 
 
-	public void _setClient(Client client) {
+	 void _setClient(Client client) {
 		this.client = client;
 	}
 
@@ -159,10 +159,7 @@ public boolean equals(Object obj) {
 	}
 
 
-	public void _setWorkOrder(WorkOrder workOrder2) {
-		// TODO Auto-generated method stub
-		
-	}
+
 	
 	
 	

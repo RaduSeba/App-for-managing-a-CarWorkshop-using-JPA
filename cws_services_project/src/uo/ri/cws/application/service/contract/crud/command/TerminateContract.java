@@ -12,6 +12,7 @@ import uo.ri.cws.application.util.BusinessChecks;
 import uo.ri.cws.application.util.command.Command;
 import uo.ri.cws.domain.Contract;
 import uo.ri.cws.domain.Mechanic;
+import uo.ri.cws.domain.Contract.ContractState;
 import uo.ri.util.assertion.ArgumentChecks;
 
 public class TerminateContract implements Command<Void> {
@@ -22,8 +23,9 @@ public class TerminateContract implements Command<Void> {
 
 	public TerminateContract(String contractId) {
 		
-		ArgumentChecks.isNotNull(id, "ID cannot be null");
-		ArgumentChecks.isNotEmpty(id, "The id cannot be empty");
+		ArgumentChecks.isNotNull(contractId, "ID cannot be null");
+		ArgumentChecks.isNotEmpty(contractId, "The id cannot be empty");
+		ArgumentChecks.isNotBlank(contractId,"The id cannot be blank");
 		
 		this.id=contractId;
 		
@@ -43,7 +45,7 @@ public class TerminateContract implements Command<Void> {
 		
 		Contract c=co.get();
 		
-		BusinessChecks.isFalse(c.getState().equals("TERMINATED"), "THe contract is already terminated");
+		BusinessChecks.isFalse(c.getState().equals(ContractState.TERMINATED), "THe contract is already terminated");
 		
 		Optional<Mechanic> om=mrepo.findById(c.getMechanic().get().getId());
 		

@@ -16,79 +16,55 @@ import uo.ri.cws.domain.Mechanic;
 import uo.ri.cws.domain.ProfessionalGroup;
 
 public class FireTests {
-    private Mechanic mechanic;
-    private Contract contract;// , secondContract;
-    private ContractType type;
-    private ProfessionalGroup group;
+	private Mechanic mechanic;
+	private Contract contract;
+	private ContractType type;
+	private ProfessionalGroup group;
 
-    @Before
-    public void setUp() {
-	mechanic = new Mechanic("dni", "nombre", "apellidos");
-	type = new ContractType("type", 1.5);
-	group = new ProfessionalGroup("group", 100.0, 10.0);
-	double wage = 1000.0;
+	@Before
+	public void setUp() {
+		mechanic = new Mechanic("dni", "nombre", "apellidos");
+		type = new ContractType("type", 1.5);
+		group = new ProfessionalGroup("group", 100.0, 10.0);
+		double wage = 1000.0;
 
-	contract = new Contract(mechanic, type, group, wage);
-    }
+		contract = new Contract(mechanic, type, group, wage);
+	}
 
-    @Test
-    public void testLinkOnFire() {
-	Associations.Fire
-		.link(contract);
+	@Test
+	public void testLinkOnFire() {
+		Associations.Fire.link(contract, mechanic);
 
-	Optional<Mechanic> om = contract
-		.getFiredMechanic();
-	assertTrue(om
-		.isPresent());
-	Mechanic m = om
-		.get();
-	assertTrue(m
-		.getTerminatedContracts()
-		.contains(contract));
-	assertTrue(m
-		.equals(contract
-			.getMechanic()
-			.get()));
-    }
+		Optional<Mechanic> om = contract.getFiredMechanic();
+		assertTrue(om.isPresent());
+		Mechanic m = om.get();
+		assertTrue( m.getTerminatedContracts().contains(contract) );
+		assertTrue( m.equals(contract.getMechanic().get()) );
+	}
 
-    @Test
-    public void testUnlinkOnFire() {
-	contract
-		.setFiredMechanic(mechanic);
-	mechanic
-		._getTerminatedContracts()
-		.add(contract);
+	@Test
+	public void testUnlinkOnFire() {
+		Associations.Fire.link(contract, mechanic);
 
-	Mechanic m = contract
-		.getFiredMechanic()
-		.get();
+		Mechanic m = contract.getFiredMechanic().get();
 
-	Associations.Fire
-		.unlink(contract);
+		Associations.Fire.unlink(contract, mechanic);
 
-	assertFalse(m
-		.getTerminatedContracts()
-		.contains(contract));
-	assertTrue(contract
-		.getFiredMechanic()
-		.isEmpty());
-    }
+		assertFalse( m.getTerminatedContracts().contains(contract) );
+		assertTrue( contract.getFiredMechanic().isEmpty() );
+	}
 
-    @Test
-    public void testSafeReturn() {
-	Set<Contract> contracts = mechanic
-		.getTerminatedContracts();
-	int num = contracts
-		.size();
+	@Test
+	public void testSafeReturn() {
+		Set<Contract> contracts = mechanic.getTerminatedContracts();
+		int num = contracts.size();
 
-	contracts
-		.add(contract);
+		contracts.add(contract);
 
-	assertTrue(contracts
-		.size() == num + 1);
-	assertFalse("It must be a copy of the collection or a read-only version", mechanic
-		.getTerminatedContracts()
-		.contains(contract));
-    }
+		assertTrue(contracts.size() == num + 1);
+		assertFalse(
+				"It must be a copy of the collection or a read-only version",
+				mechanic.getTerminatedContracts().contains(contract));
+	}
 
 }

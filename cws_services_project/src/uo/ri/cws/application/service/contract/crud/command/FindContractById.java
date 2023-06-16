@@ -5,6 +5,7 @@ import java.util.Optional;
 import uo.ri.conf.Factory;
 import uo.ri.cws.application.repository.ContractRepository;
 import uo.ri.cws.application.service.BusinessException;
+import uo.ri.cws.application.service.contract.ContractAssembler;
 import uo.ri.cws.application.service.contract.ContractService.ContractDto;
 import uo.ri.cws.application.util.DtoAssembler;
 import uo.ri.cws.application.util.command.Command;
@@ -27,7 +28,7 @@ public class FindContractById implements Command<Optional<ContractDto>> {
 	@Override
 	public Optional<ContractDto> execute() throws BusinessException {
 	
-		return  repo.findById(id).map(m->DtoAssembler.toDto(m));
+		return  repo.findById(id).map(m->ContractAssembler.toDto(m));
 	}
 
 }

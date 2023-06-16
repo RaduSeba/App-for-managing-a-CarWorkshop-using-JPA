@@ -62,20 +62,20 @@ public class ToChargeTests {
 		cash = new Cash( client );
 		charge = new Charge(invoice, cash, 100.0);
 		// Constructor invokes associations.link
-	//	Associations.Charges.link(invoice, charge, cash);
+//		Associations.Charges.link(invoice, charge, cash);
 
 	}
 	
 	
 	@Test
 	public void testInvoiceChargeLinkOnAssign() {
+		
 		assertTrue( charge.getInvoice() == invoice );
 		assertTrue( invoice.getCharges().contains(charge) );
 	}
 
 	@Test
 	public void testCashChargeLinkOnAssign() {
-		
 		assertTrue( charge.getPaymentMean()== cash );
 		assertTrue( cash.getCharges().contains(charge) );
 	}

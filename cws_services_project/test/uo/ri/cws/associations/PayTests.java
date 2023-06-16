@@ -3,6 +3,7 @@ package uo.ri.cws.associations;
 import static org.junit.Assert.assertTrue;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -99,5 +100,22 @@ public class PayTests {
 		assertTrue( charge.getInvoice() == null );
 		assertTrue( charge.getPaymentMean() == null );
 	}
+	
+	/*
+	 * Alb lo quita ¿ Por qué?
+	 */
+	@Test
+	public void testSafeReturn() {
+		Set<Charge> chs = cash.getCharges();
+		int num = chs.size();
 
+		chs.remove( charge );
+
+		assertTrue( cash.getCharges().size() == num );
+		assertTrue( "It must be a copy of the collection", 
+			cash.getCharges().contains(charge)
+		);
+		
+		
+	}
 }

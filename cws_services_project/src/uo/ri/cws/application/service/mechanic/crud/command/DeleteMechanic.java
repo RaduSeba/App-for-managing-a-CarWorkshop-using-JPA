@@ -8,6 +8,7 @@ import uo.ri.cws.application.service.BusinessException;
 import uo.ri.cws.application.util.BusinessChecks;
 import uo.ri.cws.application.util.command.Command;
 import uo.ri.cws.domain.Mechanic;
+import uo.ri.util.assertion.ArgumentChecks;
 
 public class DeleteMechanic implements Command<Void> {
 
@@ -16,6 +17,11 @@ public class DeleteMechanic implements Command<Void> {
 	
 	
 	public DeleteMechanic(String mechanicId) {
+		
+		ArgumentChecks.isNotNull(mechanicId, "THe mechanic id is null");
+		ArgumentChecks.isNotEmpty(mechanicId, "The id cannot be null");
+		ArgumentChecks.isNotBlank(mechanicId, "The id cannot be null");
+		
 		this.mechanicId = mechanicId;
 	}
 
@@ -30,7 +36,7 @@ public class DeleteMechanic implements Command<Void> {
 		  Mechanic m =om.get();
 		  
 		
-		  BusinessChecks.isTrue(m.getInterventions().size()>
+		  BusinessChecks.isFalse(m.getInterventions().size()>
 		  0,"The mechanic has interventions");
 		  BusinessChecks.isTrue(m.getAssigned().size()==
 		  0,"The mechanic has workOrders");

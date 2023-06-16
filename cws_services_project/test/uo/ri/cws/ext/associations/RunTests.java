@@ -21,7 +21,6 @@ public class RunTests {
 	private Contract contract;
 	private ContractType type;
 	private ProfessionalGroup group;
-	private double wage;
 	private Payroll payroll;
 
 	@Before
@@ -29,7 +28,7 @@ public class RunTests {
 		mechanic = new Mechanic("dni", "nombre", "apellidos");
 		type = new ContractType("type", 1.5);
 		group = new ProfessionalGroup("group", 100.0, 10.0);
-		wage = 1000.0;
+		double wage = 1000.0;
 
 		contract = new Contract(mechanic, type, group, wage);
 		payroll = new Payroll(contract, LocalDate.now());
@@ -37,23 +36,17 @@ public class RunTests {
 
 	@Test
 	public void testLinkOnRun() {
-		
-		assertTrue(contract	.getPayrolls()
-							.contains(payroll));
-		assertTrue(payroll	.getContract()
-							.equals(contract));
-
+		assertTrue(contract.getPayrolls().contains(payroll));
+		assertTrue(payroll.getContract().equals(contract));
 	}
 
 	@Test
 	public void testUnlinkOnRun() {
 
-		Associations.Run.unlink(payroll);
+		Associations.Run.unlink(contract, payroll);
 
 		assertTrue(payroll.getContract() == null);
-		assertFalse(contract.getPayrolls()
-							.contains(payroll));
-
+		assertFalse(contract.getPayrolls().contains(payroll));
 	}
 
 	@Test
@@ -64,11 +57,9 @@ public class RunTests {
 
 		payrolls.remove(payroll);
 
-		assertTrue(contract	.getPayrolls()
-							.size() == num);
+		assertTrue(contract.getPayrolls().size() == num);
 		assertTrue("It must be a copy of the collection or a read-only version",
-				contract.getPayrolls()
-						.contains(payroll));
+				contract.getPayrolls().contains(payroll));
 	}
 
 }

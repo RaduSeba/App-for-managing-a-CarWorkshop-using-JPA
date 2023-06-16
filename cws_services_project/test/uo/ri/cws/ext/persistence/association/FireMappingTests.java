@@ -17,80 +17,56 @@ import uo.ri.cws.persistence.util.UnitOfWork;
 
 public class FireMappingTests {
 
-    private UnitOfWork unitOfWork;
-    private EntityManagerFactory factory;
-    private Mechanic mechanic;
-    private Contract contract;
-    private ContractType type;
-    private ProfessionalGroup group;
+	private UnitOfWork unitOfWork;
+	private EntityManagerFactory factory;
+	private Mechanic mechanic;
+	private Contract contract;
+	private ContractType type;
+	private ProfessionalGroup group;
 
-    @Before
-    public void setUp() {
-	factory = Persistence
-		.createEntityManagerFactory("carworkshop");
-	unitOfWork = UnitOfWork
-		.over(factory);
+	@Before
+	public void setUp() {
+		factory = Persistence.createEntityManagerFactory("carworkshop");
+		unitOfWork = UnitOfWork.over(factory);
 
-	mechanic = new Mechanic("mechanic-dni");
+		mechanic = new Mechanic("mechanic-dni");
 
-	type = new ContractType("contract-type-name", 2.0);
-	group = new ProfessionalGroup("professional-group-name", 300.0, 10.0);
-	contract = new Contract(mechanic, type, group, 3000.0);
-	contract
-		.terminate();
-	unitOfWork
-		.persist(contract, group, type, mechanic);
-    }
+		type = new ContractType("contract-type-name", 2.0);
+		group = new ProfessionalGroup("professional-group-name", 300.0, 10.0);
+		contract = new Contract(mechanic, type, group, 3000.0);
+		contract.terminate();
+		unitOfWork.persist(contract, group, type, mechanic);
+	}
 
-    @After
-    public void tearDown() {
-	unitOfWork
-		.remove(contract, group, type, mechanic);
-	factory
-		.close();
-    }
+	@After
+	public void tearDown() {
+		unitOfWork.remove(contract, group, type, mechanic);
+		factory.close();
+	}
 
-    /**
-     * A contract terminated recovers its mechanic
-     */
-    @Test
-    public void testContractTerminatedRecoversMechanic() {
+	/**
+	 * A contract terminated recovers its mechanic
+	 */
+	@Test
+	public void testContractTerminatedRecoversMechanic() {
 
-	Contract restored = unitOfWork
-		.findById(Contract.class, contract
-			.getId());
+		Contract restored = unitOfWork.findById(Contract.class, contract.getId());
 
-	assertTrue(restored
-		.getMechanic()
-		.isPresent());
-	assertTrue(restored
-		.getMechanic()
-		.get()
-		.equals(mechanic));
-	assertTrue(restored
-		.getFiredMechanic()
-		.isPresent());
-	assertTrue(restored
-		.getFiredMechanic()
-		.get()
-		.equals(mechanic));
-    }
+		assertTrue(restored.getMechanic().isPresent());
+		assertTrue(restored.getMechanic().get().equals(mechanic));
+		assertTrue(restored.getFiredMechanic().isPresent());
+		assertTrue(restored.getFiredMechanic().get().equals(mechanic));
+	}
 
-    /**
-     * A fired mechanic recovers its contract
-     */
-    @Test
-    public void testMechanicRecoversContractInForce() {
+	/**
+	 * A fired mechanic recovers its contract
+	 */
+	@Test
+	public void testMechanicRecoversContractInForce() {
 
-	Mechanic restored = unitOfWork
-		.findById(Mechanic.class, mechanic
-			.getId());
+		Mechanic restored = unitOfWork.findById(Mechanic.class, mechanic.getId());
 
-	assertTrue(restored
-		.getTerminatedContracts()
-		.size() == 1);
-	assertTrue(restored
-		.getTerminatedContracts()
-		.contains(contract));
-    }
+		assertTrue(restored.getTerminatedContracts().size() == 1);
+		assertTrue(restored.getTerminatedContracts().contains(contract));
+	}
 }

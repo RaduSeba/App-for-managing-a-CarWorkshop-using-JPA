@@ -54,18 +54,19 @@ public class ContractServiceImpl implements ContractService {
 		return executor.execute(new FindContractById( id ));
 	}
 
-	@Override
-	public List<ContractSummaryDto> findContractsByMechanic(String mechanicDni)
-			throws BusinessException {
-		
-		 return executor.execute(new FindContractsByMechanic( mechanicDni));
-	}
+	
 
 	@Override
 	public List<ContractSummaryDto> findAllContracts()
 			throws BusinessException {
 		
 		return executor.execute(new FindAllContracts());
+	}
+
+	@Override
+	public List<ContractSummaryDto> findContractsByMechanicDni(String mechanicDni) throws BusinessException {
+		// TODO Auto-generated method stub
+		 return executor.execute(new FindContractsByMechanic( mechanicDni));
 	}
 
 }

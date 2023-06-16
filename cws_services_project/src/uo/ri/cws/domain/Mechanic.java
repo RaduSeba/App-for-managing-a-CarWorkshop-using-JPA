@@ -114,12 +114,7 @@ public class Mechanic extends BaseEntity {
 			Set<WorkOrder> assigned, Set<Intervention> interventions) {
 		
 		
-		
-		
-		
-		this.dni = dni;
-		this.surname = surname;
-		this.name = name;
+		this(dni,surname,name);
 		this.assigned = assigned;
 		this.interventions = interventions;
 	}
@@ -173,13 +168,13 @@ public class Mechanic extends BaseEntity {
 		return new HashSet<>(contractsterminated);
 	}
 	
-	public Set<Contract> _getTerminatedContracts() {
+	 Set<Contract> _getTerminatedContracts() {
 		return contractsterminated;
 	}
 
 	
 	
-	public void _setContract(Optional<Contract> c)
+	void _setContract(Optional<Contract> c)
 	{
 		if(c.isEmpty())
 		{

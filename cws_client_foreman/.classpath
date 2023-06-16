@@ -14,6 +14,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry combineaccessrules="false" kind="src" path="/util"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/cws_services_project"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/cws_services_jpa"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

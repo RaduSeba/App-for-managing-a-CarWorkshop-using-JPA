@@ -1,6 +1,6 @@
 package uo.ri.cws.domain;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;

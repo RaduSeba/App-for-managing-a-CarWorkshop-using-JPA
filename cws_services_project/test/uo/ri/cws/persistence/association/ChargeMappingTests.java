@@ -48,8 +48,8 @@ public class ChargeMappingTests {
 		voucher = new Voucher("code", "a voucher", 100);
 		cash = new Cash( client );
 
-		Associations.Pay.link(client, card);
-		Associations.Pay.link(client, voucher);
+		Associations.Pay.link(card, client);
+		Associations.Pay.link(voucher, client);
 		// cash automatically linked
 
 		chargeWithCash = new Charge(invoice, cash, 0);

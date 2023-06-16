@@ -10,6 +10,9 @@ import uo.ri.cws.application.service.mechanic.crud.command.AddMechanic;
 import uo.ri.cws.application.service.mechanic.crud.command.DeleteMechanic;
 import uo.ri.cws.application.service.mechanic.crud.command.FindAllMechanics;
 import uo.ri.cws.application.service.mechanic.crud.command.FindMechanicById;
+import uo.ri.cws.application.service.mechanic.crud.command.FindMechanicsInContractType;
+import uo.ri.cws.application.service.mechanic.crud.command.FindMechanicsInForce;
+import uo.ri.cws.application.service.mechanic.crud.command.FindMechanicsInProfessionalGroup;
 import uo.ri.cws.application.service.mechanic.crud.command.UpdateMechanic;
 import uo.ri.cws.application.util.command.CommandExecutor;
 
@@ -44,22 +47,20 @@ public class MechanicCrudServiceImpl implements MechanicCrudService {
 
 	@Override
 	public List<MechanicDto> findMechanicsInForce() throws BusinessException {
-		// TODO Auto-generated method stub
-		return null;
+		return executor.execute(new FindMechanicsInForce());
 	}
 
 	@Override
 	public List<MechanicDto> findMechanicsWithContractInForceInContractType(
 			String name) throws BusinessException {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return executor.execute(new  FindMechanicsInContractType (name));
 	}
 
 	@Override
 	public List<MechanicDto> findMechanicsInProfessionalGroups(String name)
 			throws BusinessException {
-		// TODO Auto-generated method stub
-		return null;
+		return executor.execute(new FindMechanicsInProfessionalGroup(name));
 	}
 
 }

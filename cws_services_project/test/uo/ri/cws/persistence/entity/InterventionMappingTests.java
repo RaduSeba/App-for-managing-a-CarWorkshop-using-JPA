@@ -3,7 +3,6 @@ package uo.ri.cws.persistence.entity;
 import static org.junit.Assert.assertEquals;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -64,10 +63,9 @@ public class InterventionMappingTests {
 		assertEquals( intervention.getId(), restored.getId() );
 		assertEquals( intervention.getMechanic(), restored.getMechanic() );
 		assertEquals( intervention.getWorkOrder(), restored.getWorkOrder() );
+		assertEquals( intervention.getDate(), restored.getDate() );
 		assertEquals( intervention.getMinutes(), restored.getMinutes() );
-		assertEquals( intervention.getDate().truncatedTo(ChronoUnit.MILLIS),
-				   restored.getDate().truncatedTo(ChronoUnit.MILLIS) 
-			);
+
 		assertEquals( intervention.getSubstitutions(), restored.getSubstitutions() );
 	}
 

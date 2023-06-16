@@ -68,7 +68,7 @@ public class ContractType extends BaseEntity {
 		return new HashSet<>( contracts );
 	}
 	
-	public Set<Contract> _getContracts() {
+	 Set<Contract> _getContracts() {
 		return contracts ;
 	}
 

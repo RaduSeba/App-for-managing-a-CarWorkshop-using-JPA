@@ -1,11 +1,15 @@
 package uo.ri.cws.domain;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 import uo.ri.cws.domain.base.BaseEntity;
+import uo.ri.util.assertion.ArgumentChecks;
 
 @Entity
 @Table(name="TCHARGES", uniqueConstraints = {
@@ -25,6 +29,8 @@ public class Charge extends BaseEntity {
 	Charge(){}
 	
 	public Charge(Invoice invoice, PaymentMean paymentMean, double amount) {
+		
+		
 		this.amount = amount;
 		this.paymentMean=paymentMean;
 		this.invoice=invoice;
@@ -44,8 +50,8 @@ public class Charge extends BaseEntity {
 	}
 
 	public double getAmount() {
-		return amount;
-	}
+        return Math.round(amount * 100.0) / 100.0;
+    }
 
 	public void setAmount(double amount) {
 		this.amount = amount;
@@ -55,7 +61,7 @@ public class Charge extends BaseEntity {
 		return invoice;
 	}
 
-	public void _setInvoice(Invoice invoice) {
+	 void _setInvoice(Invoice invoice) {
 		this.invoice = invoice;
 	}
 	public void setInvoice(Invoice invoice) {
@@ -66,7 +72,7 @@ public class Charge extends BaseEntity {
 		return this.paymentMean;
 	}
 
-	public void _setPaymentMean(PaymentMean paymentMean) {
+	 void _setPaymentMean(PaymentMean paymentMean) {
 		this.paymentMean = paymentMean;
 	}
 

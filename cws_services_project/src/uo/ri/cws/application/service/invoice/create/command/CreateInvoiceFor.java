@@ -26,7 +26,7 @@ public class CreateInvoiceFor implements Command<InvoiceDto>{
 		{
 			ArgumentChecks.isNotEmpty(workOrderIds.get(i),"one id is empty" );
 			ArgumentChecks.isNotNull(workOrderIds.get(i), "one id is null");
-			ArgumentChecks.isNotBlank(workOrderIds.get(i), null);
+			ArgumentChecks.isNotBlank(workOrderIds.get(i), "one id is empty");
 		}
 		
 		
@@ -49,6 +49,11 @@ public class CreateInvoiceFor implements Command<InvoiceDto>{
 		
 		
 		checkAllAreFinished(workOrders);
+		
+		if(number==null)
+		{
+			number=(long) 0;
+		}
 		
 		Invoice i= new Invoice(number,workOrders);
 		invsRepo.add(i);

@@ -1,5 +1,6 @@
 package uo.ri.cws.domain;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.time.LocalDate;
@@ -64,8 +65,8 @@ public class InvoiceTests {
 		workOrders.add( createAnotherWorkOrder() );
 		Invoice invoice = new Invoice( 0L, workOrders );
 
-		// amount = (137.5 new work order + 250.0 first one) * 21% iva
-		assertTrue( invoice.getAmount() ==  468.88 ); // 2 cents rounded
+		// amount = (137.5 new workorder + 250.0 first workorder) * 21% vat
+		assertEquals( 468.88, invoice.getAmount(), 0.01 ); // 2 cents rounded
 	}
 
 	/**
@@ -89,11 +90,11 @@ public class InvoiceTests {
 		invoice.addWorkOrder( workOrder );
 		invoice.addWorkOrder( createAnotherWorkOrder() );
 
-		assertTrue( invoice.getAmount() ==  468.88 ); // 2 cents rounding
+		assertEquals( 468.88, invoice.getAmount(), 0.01 ); // 2 cents rounding
 	}
 
 	/**
-	 * A new invoice with work orders is in NOT_YET_PAID status
+	 * A new invoice with work orders is in NOT_YET_PAID state
 	 */
 	@Test
 	public void testNewInvoiceIsNotYetPaidStatus() {
@@ -120,7 +121,7 @@ public class InvoiceTests {
 	}
 
 	/**
-	 * A work order, when added to an invoice, changes its status to INVOICED
+	 * A work order, when added to an invoice, changes its state to INVOICED
 	 * Added through the constructor
 	 */
 	@Test
@@ -132,7 +133,7 @@ public class InvoiceTests {
 	}
 
 	/**
-	 * A work order, when added to an invoice, changes its status to INVOICED
+	 * A work order, when added to an invoice, changes its state to INVOICED
 	 * Added by association
 	 */
 	@Test
@@ -143,11 +144,11 @@ public class InvoiceTests {
 	}
 
 	/**
-	 * All the work orders changes its status to INVOICED when added to
+	 * All the work orders changes its state to INVOICED when added to
 	 * an invoice
 	 */
 	@Test
-	public void testDosAveriasFacturadasAddAveria() {
+	public void test2InvoicedWorkordersAddWorkorder() {
 		WorkOrder otherWorkOrther = createAnotherWorkOrder();
 
 		Invoice f = new Invoice( 0L );
@@ -159,7 +160,7 @@ public class InvoiceTests {
 	}
 
 	/**
-	 * Creates a new invoiced witha delay of 100 milliseconds to avoid a
+	 * Creates a new invoice with a delay of 100 milliseconds to avoid a
 	 * collision in the dates field (same millisecond)
 	 *
 	 * It could be problematic if the identity of the work order depends on
@@ -184,7 +185,7 @@ public class InvoiceTests {
 		try {
 			Thread.sleep(millis);
 		} catch (InterruptedException ignored) {
-			// dont't care if this occurs
+			// doesn't care if this occurs
 		}
 	}
 

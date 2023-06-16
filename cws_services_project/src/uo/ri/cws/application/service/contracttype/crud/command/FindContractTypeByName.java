@@ -21,6 +21,7 @@ public class FindContractTypeByName implements Command<Optional<ContractTypeDto>
 		
 		ArgumentChecks.isNotEmpty(name,"The name cannot be empty");
 		ArgumentChecks.isNotNull(name, "The name cannot be null");
+		ArgumentChecks.isNotBlank(name,"The name cannot be blank");
 		
 		
 		this.n=name;

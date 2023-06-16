@@ -52,7 +52,7 @@ public class DtoAssembler {
 		 dto.version = c.getVersion();
 
 		 dto.dni = c.getMechanic().get().getId();
-		dto.annualBaseWage=c.calculateannualwage();
+		dto.annualBaseWage=c.calculateAnnualWage();
 		dto.contractTypeName=c.getContractType().getName();
 		dto.endDate=c.getEndDate().get();
 		dto.startDate=c.getStartDate();
@@ -282,5 +282,7 @@ public class DtoAssembler {
 				.map( a -> toDto( a ) )
 				.collect( Collectors.toList() );
 	}
+	
+	
 
 }

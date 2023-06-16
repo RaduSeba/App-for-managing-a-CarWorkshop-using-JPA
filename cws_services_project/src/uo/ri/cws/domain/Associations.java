@@ -44,7 +44,7 @@ public class Associations {
 
 	public static class Pay {
 
-		public static void link(Client client, PaymentMean pm) {
+		public static void link( PaymentMean pm,Client client) {
 			
 			pm._setClient(client);
 			client._getPaymeantMean().add(pm);
@@ -195,21 +195,25 @@ public class Associations {
 	
 	public static class Fire {
 
-		public static void link(Contract contract) {
+		public static void link(Contract contract, Mechanic mechanic) {
 			
-			contract.getMechanic().get()._getTerminatedContracts().add(contract);
+			//contract.getMechanic().get()._getTerminatedContracts().add(contract);
+			mechanic._setContract(Optional.empty());
+			mechanic._getTerminatedContracts().add(contract);
+			
 			//contract.getMechanic().get().setContract(null);
-			contract.setFiredMechanic(contract.getMechanic().get());
+			contract._setFiredMechanic(Optional.ofNullable(mechanic));
 			//contract.setMechanic(null);
 			
 		
 			
 		}
 
-		public static void unlink( Contract contract) {
+		public static void unlink( Contract contract, Mechanic mechanic) {
 			Optional<Mechanic> empty = Optional.empty();
 			
-			contract.getMechanic().get()._getTerminatedContracts().remove(contract);
+			//contract.getMechanic().get()._getTerminatedContracts().remove(contract);
+			mechanic._getTerminatedContracts().remove(contract);
 			contract._setFiredMechanic(empty);
 			
 			
@@ -290,9 +294,10 @@ public class Associations {
 			
 		}
 
-		public static void unlink(Payroll payrool) {
+		public static void unlink(Contract contrac,Payroll payrool) {
 			
-			payrool.getContract()._getPayrools().remove(payrool);
+			//payrool.getContract()._getPayrools().remove(payrool);
+			contrac._getPayrools().remove(payrool);
 			payrool.setContract(null);
 			
 			

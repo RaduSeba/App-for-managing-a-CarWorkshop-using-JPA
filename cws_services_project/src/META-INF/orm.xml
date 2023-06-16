@@ -12,7 +12,7 @@
 	
 	
 	<named-query name="Mechanic.findByDni">
-		<query> select m from Mechanic m where m.dni = ?1</query>
+		<query> select m from Mechanic m where m.dni =?1</query>
 	</named-query>
 
 	<!-- WorkOrder queries --> 
@@ -39,6 +39,18 @@
 		<query> select m from Mechanic m </query>
 	</named-query>
 	
+	<named-query name="Mechanic.findAllInForce">
+		<query> select c.mechanic from Contract c </query>
+	</named-query>
+	
+	<named-query name="Mechanic.findAllInContractType">
+		<query> select c.mechanic from Contract c where c.contracttype.name= ?1 </query>
+	</named-query>
+	
+	<named-query name="Mechanic.findAllInProfessionalGroup">
+		<query> select c.mechanic from Contract c where c.professionalgroup.name= ?1 </query>
+	</named-query>
+	
 	<named-query name="Mechanic.findById">
 		<query> select m from Mechanic m where m.id = ?1</query>
 	</named-query>
@@ -62,8 +74,23 @@
 		<query>select p from ProfessionalGroup p where p.name = ?1</query>
 	</named-query>
 	
-	<named-query name="Payroll.findByContract">
+	<named-query name="Payroll.findbyContract">
 		<query>select p from Payroll p where p.contract.id = ?1</query>
+	</named-query>
+	
+	<named-query name="Payroll.findCurrentMonth">
+		<query>select p from Payroll p where p.date >= ?1 
+											and p.date &lt; ?2 </query>
+	</named-query>
+	
+		<named-query name="Contract.findbyGroup">
+		<query> select c from Contract c where c.professionalgroup.id = ?1</query>
+	</named-query>
+	
+	
+	<named-query name="Payroll.findCurrentMonthByContractId">
+		<query>select p from Payroll p where p.contract.id= ?1 and  p.date >= ?2 
+											and p.date &lt; ?3  </query>
 	</named-query>
 	
 	
@@ -74,6 +101,16 @@
 	<named-query name="Contract.findbyMechanic">
 		<query> select c from Contract c where c.mechanic.id = ?1</query>
 	</named-query>
+	
+	<named-query name="Contract.findbyMechanicFired">
+		<query> select c from Contract c where c.firedmechanic.id = ?1</query>
+	</named-query>
+	
+	<named-query name="Contract.findbyMechanicDni">
+		<query> select c from Contract c where c.mechanic.dni = ?1</query>
+	</named-query>
+	
+
 	
 	<named-query name="ContractType.findAll">
 		<query> select c from ContractType c </query>

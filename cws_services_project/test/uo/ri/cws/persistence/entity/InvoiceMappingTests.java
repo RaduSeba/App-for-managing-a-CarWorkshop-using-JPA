@@ -65,7 +65,7 @@ public class InvoiceMappingTests {
 		assertEquals( invoice.getDate(), restored.getDate() );
 		assertEquals( invoice.getAmount(), restored.getAmount(), 0.0001 );
 		assertEquals( invoice.getVat(), restored.getVat(), 0.0001 );
-		assertEquals( invoice.getState(), restored.getState() );
+		assertEquals( invoice.getStatus(), restored.getStatus() );
 
 		assertEquals( invoice.getWorkOrders(), restored.getWorkOrders() );
 	}

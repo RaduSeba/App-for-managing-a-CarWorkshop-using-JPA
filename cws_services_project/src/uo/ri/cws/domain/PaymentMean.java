@@ -35,7 +35,7 @@ public abstract class PaymentMean extends BaseEntity {
 	}
 
 	
-	public Client _getClient() {
+	 Client _getClient() {
 		return this.client;
 	}
 

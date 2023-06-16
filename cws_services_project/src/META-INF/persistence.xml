@@ -11,17 +11,21 @@
         <shared-cache-mode>NONE</shared-cache-mode>
 
 		<properties>
+		<!--
 			
 			<property name="eclipselink.ddl-generation" value="drop-and-create-tables"/>
+			-->
 	  
 			<property name="eclipselink.logging.level.sql" value="FINE"/>
             <property name="eclipselink.logging.level" value="OFF" />
             <property name="eclipselink.logging.cache" value="OFF" />
             <property name="eclipselink.logging.parameters" value="true" />
 			<property name="eclipselink.logging.file" value="eclipselink.log"/>
-						
+					
  			<property name="javax.persistence.jdbc.url" value="jdbc:hsqldb:hsql://localhost" />
+	
 	<!--
+	
 			<property name="javax.persistence.jdbc.url" value="jdbc:hsqldb:mem:test" />
 -->
 			<property name="javax.persistence.jdbc.driver" value="org.hsqldb.jdbcDriver" />

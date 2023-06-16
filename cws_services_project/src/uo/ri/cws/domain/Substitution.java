@@ -54,9 +54,7 @@ public class Substitution extends BaseEntity {
 	
 	
 
-	public Substitution() {
-		super();
-	}
+	 Substitution() {}
 
 
 

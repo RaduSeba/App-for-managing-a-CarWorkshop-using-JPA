@@ -37,7 +37,7 @@ public class ChargeMappingTests {
 		client.setAddress(address);
 
 		voucher = new Voucher("voucher-code", "voucher-description", 100);
-		Associations.Pay.link(client, voucher);
+		Associations.Pay.link(voucher, client);
 
 		invoice = new Invoice( 1001L );
 		charge = new Charge( invoice, voucher, invoice.getAmount() );

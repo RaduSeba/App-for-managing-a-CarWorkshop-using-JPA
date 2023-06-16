@@ -40,7 +40,7 @@ public class WorkOrderTests {
 		sparePart = new SparePart("R1001", "junta la trocla", 100.0 /* € */);
 		new Substitution(sparePart, intervention, 2);
 
-		workOrder.markAsFinished(); // changes status & computes price
+		workOrder.markAsFinished(); // changes state & computes price
 	}
 
 	/**
@@ -96,7 +96,7 @@ public class WorkOrderTests {
 	}
 
 	/**
-	 * A just created invoice is in NOT_YET_PAID status
+	 * A just created invoice is in NOT_YET_PAID state
 	 */
 	@Test
 	public void testNotYetPaidForNewInvoice() {

@@ -48,7 +48,6 @@ public class InterventionTests {
 
 	@Test
 	public void testUnlinkOnInterventionByWorkOrder() {
-		
 		Associations.Intervene.unlink(intervention);
 		
 		assertTrue( ! workOrder.getInterventions().contains( intervention ));

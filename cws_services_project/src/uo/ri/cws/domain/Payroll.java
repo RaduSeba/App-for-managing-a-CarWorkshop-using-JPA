@@ -1,8 +1,10 @@
 package uo.ri.cws.domain;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.persistence.Basic;
 import javax.persistence.Entity;
@@ -41,11 +43,12 @@ public class Payroll extends BaseEntity {
 		this.contract = contract;
 		this.monthlyWage=this.contract.getAnnualBaseWage()/14;
 		this.nic=Math.floor(((this.contract.getAnnualBaseWage() * 0.05) / 12) * 100) / 100;
-		calculatebonus();
+		calculateBonus();
 		
-		calculatetrinennium();
-		calculateproductivity();
-		calculateincometax();
+		calculateTrinennium();
+		calculateProductivity();
+		calculateIncometax();
+		this.incomeTax=Math.round(this.incomeTax * 100.0) / 100.0;
 		Associations.Run.link(contract,this);
 	}
 
@@ -60,11 +63,11 @@ public class Payroll extends BaseEntity {
 		this.monthlyWage=this.contract.getAnnualBaseWage()/14;
 		this.bonus=this.contract.getAnnualBaseWage()/14;
 		this.nic=Math.floor(((this.contract.getAnnualBaseWage() * 0.05) / 12) * 100) / 100;
-		calculatebonus();
+		calculateBonus();
 	
-		calculateproductivity();
-		calculatetrinennium();
-		calculateincometax();
+		calculateProductivity();
+		calculateTrinennium();
+		calculateIncometax();
 		Associations.Run.link(contract,this);
 	}
 
@@ -92,6 +95,7 @@ public class Payroll extends BaseEntity {
 
 	public LocalDate getDate() {
 		return date;
+		
 	}
 
 
@@ -190,7 +194,7 @@ public class Payroll extends BaseEntity {
 	}
 	
 	
-	public void calculateincometax()
+	public void calculateIncometax()
 	{
 		
 		if(this.bonus!=0)
@@ -231,32 +235,59 @@ public class Payroll extends BaseEntity {
 	}
 	
 	
-	public void calculateproductivity()
+	public void calculateProductivity()
 	{
-		if(this.contract.getMechanic().get()._getAssigned().isEmpty()==false)
+		
+		Set<WorkOrder> wo =null;
+		if(this.contract.getMechanic().isEmpty())
 		{
-			 this.productivityBonus=  this.contract.getMechanic().get()._getAssigned().iterator().next().getAmount() *this.contract.getProfessionalGroup().getProductivityBonusPercentage() / 100;
+			wo =this.contract.getFiredMechanic().get().getAssigned();
+		}
+		else
+		{
+			 wo =this.contract.getMechanic().get().getAssigned();
+		}
+		LocalDate currentDate = LocalDate.now();
+		Month currentMonth = currentDate.getMonth();
+		double productivity = this.contract.getProfessionalGroup().getProductivityBonusPercentage() / 100;
+		
+		if(wo.isEmpty()==false)
+		{
+			// this.productivityBonus+=  this.contract.getMechanic().get().getAssigned().iterator().next().getAmount() * productivity;
+			
+			for(WorkOrder w : wo)
+			{
+				//if( w.isInvoiced())
+				
+					this.productivityBonus+=w.getAmount()* productivity;
+				
+			}
 
 		}
 	}
 	
 	
 	
-	public void calculatetrinennium()
+	public void calculateTrinennium()
 	{
-		if(ChronoUnit.YEARS.between( 
+		int years = (int) ChronoUnit.YEARS.between( 
 				   this.contract.getStartDate()  , 
 				   this.date
-				)>=3)
+				);
+		if(years>=3)
 		{
-			this.trienniumPayment=this.contract.getProfessionalGroup().getTrienniumPayment();
+			this.trienniumPayment=this.contract.getProfessionalGroup().getTrienniumPayment()*(years/3);
 		}
 		
 	}
 	
-	public void calculatebonus()
+	public void calculateBonus()
 	{
-		if(this.date.equals(LocalDate.of(2022, 11, 30)) )
+		if(this.date.getMonth()==Month.NOVEMBER )
+		{
+			this.bonus=0;
+		}
+		else if(this.date.getMonth()==Month.MARCH )
 		{
 			this.bonus=0;
 		}

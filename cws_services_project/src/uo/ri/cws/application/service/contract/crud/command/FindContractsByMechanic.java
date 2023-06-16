@@ -8,6 +8,7 @@ import uo.ri.conf.Factory;
 import uo.ri.cws.application.repository.ContractRepository;
 import uo.ri.cws.application.repository.MechanicRepository;
 import uo.ri.cws.application.service.BusinessException;
+import uo.ri.cws.application.service.contract.ContractAssembler;
 import uo.ri.cws.application.service.contract.ContractService.ContractSummaryDto;
 import uo.ri.cws.application.util.DtoAssembler;
 import uo.ri.cws.application.util.command.Command;
@@ -49,7 +50,8 @@ public class FindContractsByMechanic implements Command<List<ContractSummaryDto>
 		
 		
 		
-		return DtoAssembler.toContractSummaryDtoList(res);
+		//return DtoAssembler.toContractSummaryDtoList(res);
+		return ContractAssembler.toDtoList(res);
 	}
 
 }

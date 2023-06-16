@@ -39,7 +39,7 @@ public class CreditCardMappingTests {
 				LocalDate.now().plus(1, ChronoUnit.YEARS)
 			);
 
-		Associations.Pay.link(client, creditCard);
+		Associations.Pay.link(creditCard, client);
 
 		unitOfWork.persist(client, creditCard);
 	}
